@@ -1,989 +1,270 @@
-import { useMemo, useState } from 'react';
-import {
-  Plane,
-  ShoppingBag,
-  UtensilsCrossed,
-  Store,
-  Wallet,
-  TrendingUp,
-  Sparkles,
-  ArrowUpRight,
-  CheckCircle2,
-  Coins,
-  Award,
-  Hotel,
-  Link2,
-  Layers,
-  PiggyBank,
-  CreditCard,
-  Globe,
-  Smartphone,
-  Zap,
-  Ban,
-} from 'lucide-react';
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>香港/英國跨國信用卡里數回贈最佳化計算機</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #0f172a; color: #f8fafc; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+    <div class="max-w-6xl mx-auto">
+        <header class="mb-8 text-center">
+            <h1 class="text-3xl font-bold text-amber-400 mb-2">💳 跨國里數回贈最佳化計算機</h1>
+            <p class="text-slate-400">智能過濾不合法組合，一秒精算最強地獄支付路線</p>
+        </header>
 
-// ────────────────────────────────────────────────────────────
-// Types
-// ────────────────────────────────────────────────────────────
+        <div class="bg-slate-800 p-6 rounded-2xl shadow-xl border border-slate-700 mb-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                <div>
+                    <label class="block text-sm font-medium text-slate-300 mb-2">預計消費金額</label>
+                    <input type="number" id="amount" value="2000" class="w-full bg-slate-900 border border-slate-600 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-amber-400">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-300 mb-2">消費貨幣</label>
+                    <select id="currency" class="w-full bg-slate-900 border border-slate-600 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-amber-400">
+                        <option value="HKD">HKD 港幣</option>
+                        <option value="GBP">GBP 英鎊</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-300 mb-2">消費類別</label>
+                    <select id="category" class="w-full bg-slate-900 border border-slate-600 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-amber-400">
+                        <option value="hotel">酒店/旅遊訂房 (Agoda/Booking)</option>
+                        <option value="dining">餐飲 / 外賣 App</option>
+                        <option value="online">海外/本地網購</option>
+                        <option value="general">一般簽賬</option>
+                    </select>
+                </div>
+            </div>
 
-type Currency = 'HKD' | 'GBP';
-type Category = 'local' | 'overseas' | 'dining' | 'supermarket' | 'hotel';
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 border-t border-slate-700 pt-6">
+                <div>
+                    <span class="block text-sm font-medium text-slate-300 mb-3">擁有信用卡 (可多選)</span>
+                    <div class="space-y-2">
+                        <label class="flex items-center space-x-3"><input type="checkbox" id="card_everymile" checked class="w-4 h-4 text-amber-500 rounded"> <span>HK HSBC EveryMile</span></label>
+                        <label class="flex items-center space-x-3"><input type="checkbox" id="card_amexba" checked class="w-4 h-4 text-amber-500 rounded"> <span>UK Amex BA Plus</span></label>
+                        <label class="flex items-center space-x-3"><input type="checkbox" id="card_barclays" checked class="w-4 h-4 text-amber-500 rounded"> <span>UK Barclays Avios Plus</span></label>
+                    </div>
+                </div>
+                <div>
+                    <span class="block text-sm font-medium text-slate-300 mb-3">過橋卡選項</span>
+                    <label class="flex items-center space-x-3 mt-1"><input type="checkbox" id="use_curve" checked class="w-4 h-4 text-amber-500 rounded"> <span class="text-amber-400 font-medium">使用 Curve 卡過橋 (免外幣手續費)</span></label>
+                </div>
+                <div>
+                    <span class="block text-sm font-medium text-slate-300 mb-3">酒店通道 (多選)</span>
+                    <div class="space-y-2">
+                        <label class="flex items-center space-x-3"><input type="checkbox" id="portal_web" checked class="w-4 h-4 text-amber-500 rounded"> <span>Agoda 網頁版 (基礎價)</span></label>
+                        <label class="flex items-center space-x-3"><input type="checkbox" id="portal_app" checked class="w-4 h-4 text-amber-500 rounded"> <span>Agoda App (即時92折)</span></label>
+                        <label class="flex items-center space-x-3"><input type="checkbox" id="portal_emlink" checked class="w-4 h-4 text-amber-500 rounded"> <span>EveryMile 專屬 Link (即時85折)</span></label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-6 border-t border-slate-700 pt-6">
+                <span class="block text-sm font-medium text-slate-300 mb-3">激活返利網 (只限網頁版)</span>
+                <div class="flex space-x-6">
+                    <label class="flex items-center space-x-3"><input type="checkbox" id="rebate_topcashback" checked class="w-4 h-4 text-amber-500 rounded"> <span>TopCashback (12% 現金)</span></label>
+                    <label class="flex items-center space-x-3"><input type="checkbox" id="rebate_baestore" checked class="w-4 h-4 text-amber-500 rounded"> <span>BA eStore ($10 = 3 Avios)</span></label>
+                </div>
+            </div>
+        </div>
 
-type CardId = 'hsbc-everymile' | 'amex-ba' | 'barclays-avios';
-type HotelEntryId = 'agoda-web' | 'agoda-app' | 'everymile-link';
-type PortalId = 'topcashback' | 'baestore';
+        <div class="bg-slate-800 rounded-2xl shadow-xl border border-slate-700 overflow-hidden">
+            <div class="px-6 py-4 border-b border-slate-700 bg-slate-750">
+                <h2 class="text-xl font-bold text-slate-200">📊 最強組合決策矩陣</h2>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-slate-900 text-slate-400 text-sm uppercase">
+                            <th class="px-6 py-4">排名 / 支付路線組合</th>
+                            <th class="px-6 py-4">原始房價</th>
+                            <th class="px-6 py-4">外幣手續費</th>
+                            <th class="px-6 py-4">回贈詳情 (估值)</th>
+                            <th class="px-6 py-4 text-right">真正淨支出</th>
+                        </tr>
+                    </thead>
+                    <tbody id="result-table-body" class="divide-y divide-slate-700 text-sm text-slate-300">
+                        </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 
-interface CardDef {
-  id: CardId;
-  name: string;
-  issuer: string;
-  region: 'HK' | 'UK';
-  rewardKind: 'miles' | 'avios';
-  // earn rate per unit of the card's native currency
-  nativeCurrency: Currency;
-  cardType: 'Visa' | 'Mastercard' | 'Amex';
-  // miles/avios per 1 unit of native currency
-  earnRate: number;
-  earnLabel: string;
-  fxFee: number; // fraction added on foreign-currency spend
-  accent: string;
-  applyUrl: string;
-}
+    <script>
+        const FX_RATE = 10; // 1 GBP = 10 HKD
+        const VALUE_AVIOS = 0.11;
+        const VALUE_AMILE = 0.10;
 
-interface HotelEntryDef {
-  id: HotelEntryId;
-  name: string;
-  icon: typeof Globe;
-  baseMultiplier: number; // fraction of original price (1.0, 0.92, 0.85)
-  note: string;
-  cardConstraint?: CardId; // if set, only this card can be used
-  noPortal?: boolean; // if true, no portal can stack
-}
+        function calculate() {
+            const inputAmount = parseFloat(document.getElementById('amount').value) || 0;
+            const inputCurrency = document.getElementById('currency').value;
+            const category = document.getElementById('category').value;
+            
+            // 轉換為 HKD 基準做後台計算
+            const amountInHKD = inputCurrency === 'GBP' ? inputAmount * FX_RATE : inputAmount;
+            const amountInGBP = inputCurrency === 'HKD' ? inputAmount / FX_RATE : inputAmount;
 
-interface PortalDef {
-  id: PortalId;
-  name: string;
-  kind: 'cashback' | 'avios';
-  // cashback: fraction of (post-entry-base) spend
-  // avios: avios per HK$10 (or £1)
-  rate: number;
-  rateLabel: string;
-  note: string;
-  icon: typeof Plane;
-}
+            // 獲取用戶勾選狀態
+            const cards = {
+                everymile: document.getElementById('card_everymile').checked,
+                amexba: document.getElementById('card_amexba').checked,
+                barclays: document.getElementById('card_barclays').checked
+            };
+            const useCurve = document.getElementById('use_curve').checked;
+            const portals = {
+                web: document.getElementById('portal_web').checked,
+                app: document.getElementById('portal_app').checked,
+                emlink: document.getElementById('portal_emlink').checked
+            };
+            const rebates = {
+                topcashback: document.getElementById('rebate_topcashback').checked,
+                baestore: document.getElementById('rebate_baestore').checked
+            };
 
-interface ComboResult {
-  rank: number;
-  card: CardDef;
-  useCurve: boolean;
-  hotelEntry: HotelEntryDef;
-  portal: PortalDef | null;
-  blocked: boolean;
-  blockReason: string;
-  // all in HKD
-  originalSpend: number;
-  chargedSpend: number; // after hotel entry base multiplier + FX fee
-  fxFeeAmount: number;
-  cardRewardValue: number;
-  cardRewardDisplay: string;
-  portalRewardValue: number;
-  portalRewardDisplay: string;
-  totalRewardValue: number;
-  netSpend: number;
-  effectivePct: number;
-  routeSteps: string[];
-  comboName: string;
-}
+            let combinations = [];
 
-// ────────────────────────────────────────────────────────────
-// Constants
-// ────────────────────────────────────────────────────────────
-
-const GBP_TO_HKD = 10; // £1 = HK$10
-const AVIOS_VALUE = 0.11; // 1 Avios = HK$0.11
-const MILE_VALUE = 0.1; // 1 Asia Mile = HK$0.10
-
-const CATEGORIES: { id: Category; label: string; icon: typeof Plane }[] = [
-  { id: 'local', label: '本地一般簽賬', icon: Wallet },
-  { id: 'overseas', label: '海外網購', icon: ShoppingBag },
-  { id: 'dining', label: '餐飲 / 外賣 App', icon: UtensilsCrossed },
-  { id: 'supermarket', label: '超市 / HKTVmall', icon: Store },
-  { id: 'hotel', label: '酒店 / 旅遊訂房', icon: Hotel },
-];
-
-const CARDS: CardDef[] = [
-  {
-    id: 'hsbc-everymile',
-    name: 'HSBC EveryMile',
-    issuer: 'HSBC HK',
-    region: 'HK',
-    rewardKind: 'miles',
-    nativeCurrency: 'HKD',
-    cardType: 'Visa',
-    earnRate: 1 / 5, // $5 = 1 mile (local); overseas $2 = 1 mile handled per-category
-    earnLabel: '本地 $5/里 · 海外 $2/里',
-    fxFee: 0.0195,
-    accent: 'from-red-500/80 to-rose-700/60',
-    applyUrl: 'https://www.hsbc.com.hk/credit-cards/',
-  },
-  {
-    id: 'amex-ba',
-    name: 'Amex BA Premium Plus',
-    issuer: 'American Express UK',
-    region: 'UK',
-    rewardKind: 'avios',
-    nativeCurrency: 'GBP',
-    cardType: 'Amex',
-    earnRate: 1.5, // £1 = 1.5 Avios
-    earnLabel: '每 £1 = 1.5 Avios',
-    fxFee: 0.0299,
-    accent: 'from-sky-500/80 to-blue-700/60',
-    applyUrl: 'https://www.amex.co.uk/british-airways/',
-  },
-  {
-    id: 'barclays-avios',
-    name: 'Barclays Avios Plus',
-    issuer: 'Barclays UK',
-    region: 'UK',
-    rewardKind: 'avios',
-    nativeCurrency: 'GBP',
-    cardType: 'Mastercard',
-    earnRate: 1.5, // £1 = 1.5 Avios
-    earnLabel: '每 £1 = 1.5 Avios',
-    fxFee: 0.0299,
-    accent: 'from-emerald-500/80 to-teal-700/60',
-    applyUrl: 'https://www.barclays.co.uk/credit-cards/avios/',
-  },
-];
-
-const HOTEL_ENTRIES: HotelEntryDef[] = [
-  {
-    id: 'agoda-web',
-    name: 'Agoda 網頁版',
-    icon: Globe,
-    baseMultiplier: 1.0,
-    note: '基礎價 100%，可疊加返利網',
-  },
-  {
-    id: 'agoda-app',
-    name: 'Agoda App',
-    icon: Smartphone,
-    baseMultiplier: 0.92,
-    note: '基礎價 92 折，不能疊加任何返利網',
-    noPortal: true,
-  },
-  {
-    id: 'everymile-link',
-    name: 'EveryMile Agoda 專屬 Link',
-    icon: Link2,
-    baseMultiplier: 0.85,
-    note: '網頁即時 85% 基礎價，只能用 EveryMile 卡付款',
-    cardConstraint: 'hsbc-everymile',
-  },
-];
-
-const PORTALS: PortalDef[] = [
-  {
-    id: 'topcashback',
-    name: 'TopCashback',
-    kind: 'cashback',
-    rate: 0.12,
-    rateLabel: '12% 現金回贈',
-    note: '經 TopCashback 連結訂房，額外 12% 現金回贈',
-    icon: PiggyBank,
-  },
-  {
-    id: 'baestore',
-    name: 'BA eStore',
-    kind: 'avios',
-    rate: 3, // 3 Avios per HK$10 (or £1)
-    rateLabel: '每 £1 / HK$10 = 3 Avios',
-    note: '經 BA eStore 訂房，每 £1 或 HK$10 賺 3 Avios（估值 $0.11/Avios）',
-    icon: Plane,
-  },
-];
-
-// ────────────────────────────────────────────────────────────
-// Helpers
-// ────────────────────────────────────────────────────────────
-
-function formatHKD(n: number): string {
-  return n.toLocaleString('zh-HK', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-}
-
-function toHKD(amount: number, currency: Currency): number {
-  return currency === 'GBP' ? amount * GBP_TO_HKD : amount;
-}
-
-// HSBC EveryMile earn rate depends on category
-function hsbcEarnRate(category: Category): { rate: number; label: string } {
-  switch (category) {
-    case 'local':
-      return { rate: 1 / 5, label: '$5 = 1 里' };
-    case 'supermarket':
-      return { rate: 1 / 5, label: '$5 = 1 里' };
-    case 'overseas':
-      return { rate: 1 / 2, label: '$2 = 1 里' };
-    case 'dining':
-      return { rate: 1 / 2, label: '$2 = 1 里' };
-    case 'hotel':
-      return { rate: 1 / 2, label: '$2 = 1 里' };
-  }
-}
-
-// ────────────────────────────────────────────────────────────
-// App
-// ────────────────────────────────────────────────────────────
-
-function App() {
-  const [amount, setAmount] = useState<string>('');
-  const [currency, setCurrency] = useState<Currency>('HKD');
-  const [category, setCategory] = useState<Category>('hotel');
-  const [selectedCards, setSelectedCards] = useState<Set<CardId>>(new Set(['hsbc-everymile']));
-  const [useCurve, setUseCurve] = useState<boolean>(false);
-  const [selectedHotelEntries, setSelectedHotelEntries] = useState<Set<HotelEntryId>>(new Set(['agoda-web']));
-  const [selectedPortals, setSelectedPortals] = useState<Set<PortalId>>(new Set());
-
-  const numericAmount = useMemo(() => {
-    const n = parseFloat(amount);
-    return Number.isFinite(n) && n > 0 ? n : 0;
-  }, [amount]);
-
-  const isHotel = category === 'hotel';
-  const activeCat = CATEGORIES.find((c) => c.id === category)!;
-
-  const toggle = <T,>(id: T, set: React.Dispatch<React.SetStateAction<Set<T>>>) => {
-    set((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-  };
-
-  // ── Combination engine ──
-  const combos = useMemo<ComboResult[]>(() => {
-    if (numericAmount <= 0 || selectedCards.size === 0) return [];
-
-    const spendHKD = toHKD(numericAmount, currency);
-    const cards = CARDS.filter((c) => selectedCards.has(c.id));
-
-    // Determine which hotel entries and portals are active
-    const hotelEntries = isHotel
-      ? HOTEL_ENTRIES.filter((e) => selectedHotelEntries.has(e.id))
-      : [{ ...HOTEL_ENTRIES[0], baseMultiplier: 1.0 }]; // non-hotel: no entry discount
-    const portals = isHotel ? PORTALS.filter((p) => selectedPortals.has(p.id)) : [];
-
-    const list: ComboResult[] = [];
-
-    cards.forEach((card) => {
-      hotelEntries.forEach((entry) => {
-        // Card constraint check (EveryMile link requires EveryMile card)
-        if (entry.cardConstraint && entry.cardConstraint !== card.id) return;
-
-        const portalOptions: (PortalDef | null)[] =
-          isHotel && !entry.noPortal && portals.length > 0 ? portals : [null];
-
-        portalOptions.forEach((portal) => {
-          // Portal only stacks on agoda-web
-          if (portal && entry.id !== 'agoda-web') return;
-
-          // ── Curve exclusion logic ──
-          // Curve only works with Mastercard (Barclays). Amex not supported by Curve.
-          // EveryMile is Visa — no need for Curve, and shouldn't use it.
-          const curveEligible = card.cardType === 'Mastercard';
-          const curveActive = useCurve && curveEligible;
-          const curveBlocked = useCurve && !curveEligible;
-
-          let blocked = false;
-          let blockReason = '';
-          if (curveBlocked) {
-            if (card.cardType === 'Amex') {
-              blocked = true;
-              blockReason = 'Curve 不支援 Amex 卡，此路線不可行';
-            } else if (card.cardType === 'Visa') {
-              blocked = true;
-              blockReason = 'EveryMile 為 Visa 卡，無需亦不應透過 Curve 簽賬';
+            // 定義合法的酒店通道
+            let activePortals = [{ id: 'none', name: '標準管道', discount: 1 }];
+            if (category === 'hotel') {
+                activePortals = [];
+                if (portals.web) activePortals.push({ id: 'web', name: 'Agoda 網頁版', discount: 1 });
+                if (portals.app) activePortals.push({ id: 'app', name: 'Agoda App (92折)', discount: 0.92 });
+                if (portals.emlink) activePortals.push({ id: 'emlink', name: 'EveryMile 專屬 Link (85折)', discount: 0.85 });
             }
-          }
 
-          // 1. Hotel entry base price (in HKD)
-          const baseSpendHKD = spendHKD * entry.baseMultiplier;
+            // 遍歷所有排列組合
+            activePortals.forEach(portal => {
+                // 每張信用卡
+                Object.keys(cards).forEach(cardId => {
+                    if (!cards[cardId]) return;
+                    
+                    // 🚨 硬性業務邏輯限制一：EveryMile 專屬 Link 只能用 EveryMile 卡
+                    if (portal.id === 'emlink' && cardId !== 'everymile') return;
 
-          // 2. FX fee: if card's native currency differs from user's currency
-          //    Curve waives the FX fee to 0 (only when curveActive).
-          const isForeignSpend = currency !== card.nativeCurrency;
-          const fxRate = isForeignSpend && curveActive ? 0 : isForeignSpend ? card.fxFee : 0;
-          const fxFeeAmount = baseSpendHKD * fxRate;
-          const chargedHKD = baseSpendHKD + fxFeeAmount;
+                    // 是否使用 Curve (Curve 只允許配 Barclays)
+                    let curveOptions = [false];
+                    if (useCurve && cardId === 'barclays') {
+                        curveOptions.push(true);
+                    }
 
-          // 3. Card reward
-          let cardRewardValue = 0;
-          let cardRewardDisplay = '';
-          if (card.rewardKind === 'miles') {
-            const { rate } = hsbcEarnRate(category);
-            const miles = chargedHKD * rate;
-            cardRewardValue = miles * MILE_VALUE;
-            cardRewardDisplay = `${miles.toLocaleString('zh-HK', { maximumFractionDigits: 0 })} 里`;
-          } else {
-            const chargedGBP = chargedHKD / GBP_TO_HKD;
-            const avios = chargedGBP * card.earnRate;
-            cardRewardValue = avios * AVIOS_VALUE;
-            cardRewardDisplay = `${avios.toLocaleString('zh-HK', { maximumFractionDigits: 0 })} Avios`;
-          }
+                    curveOptions.forEach(curveActive => {
+                        // 🚨 硬性業務邏輯限制二：Curve 不能搭 Amex 和 EveryMile (已在上面過濾)
 
-          // 4. Portal reward (on base spend, pre-FX-fee)
-          let portalRewardValue = 0;
-          let portalRewardDisplay = '';
-          if (portal) {
-            if (portal.kind === 'cashback') {
-              portalRewardValue = baseSpendHKD * portal.rate;
-              portalRewardDisplay = `${formatHKD(portalRewardValue)} 現金`;
-            } else {
-              const avios = (baseSpendHKD / 10) * portal.rate;
-              portalRewardValue = avios * AVIOS_VALUE;
-              portalRewardDisplay = `${avios.toLocaleString('zh-HK', { maximumFractionDigits: 0 })} Avios`;
+                        // 定義可疊加的返利網 (只有網頁版可以疊加)
+                        let activeRebates = [{ id: 'none', name: '', cashback: 0, avios: 0 }];
+                        if (category === 'hotel' && portal.id === 'web') {
+                            if (rebates.topcashback) activeRebates.push({ id: 'tcb', name: ' ➔ TopCashback', cashback: 0.12, avios: 0 });
+                            if (rebates.baestore) activeRebates.push({ id: 'ba', name: ' ➔ BA eStore', cashback: 0, avios: (amountInHKD / 10) * 3 });
+                        }
+
+                        activeRebates.forEach(rebate => {
+                            // 1. 計算折後原始房價
+                            let basePriceHKD = amountInHKD * portal.discount;
+
+                            // 2. 計算外幣手續費 (FX Fees)
+                            let fxFeeHKD = 0;
+                            if (inputCurrency === 'HKD') {
+                                // 簽港幣時，UK 卡有海外簽賬手續費 2.99%
+                                if (cardId === 'amexba' || cardId === 'barclays') {
+                                    fxFeeHKD = curveActive ? 0 : basePriceHKD * 0.0299; // Curve 避開手續費
+                                }
+                            } else if (inputCurrency === 'GBP') {
+                                // 簽英鎊時，HK 卡有手續費 1.95%
+                                if (cardId === 'everymile') fxFeeHKD = basePriceHKD * 0.0195;
+                            }
+
+                            // 3. 計算信用卡本身賺取的里數與回贈
+                            let rewardText = "";
+                            let rewardValueHKD = 0;
+
+                            if (cardId === 'everymile') {
+                                // EveryMile 里數計算
+                                let rate = (inputCurrency === 'GBP' || category === 'dining' || category === 'online') ? 2 : 5;
+                                let miles = basePriceHKD / rate;
+                                rewardValueHKD += miles * VALUE_AMILE;
+                                rewardText += `${Math.round(miles)} 亞萬里數`;
+                            } else if (cardId === 'amexba' || cardId === 'barclays') {
+                                // UK 卡里數計算 (每 £1 = 1.5 Avios)
+                                let priceInGBP = basePriceHKD / FX_RATE;
+                                let avios = priceInGBP * 1.5;
+                                rewardValueHKD += avios * VALUE_AVIOS;
+                                rewardText += `${Math.round(avios)} Avios`;
+                            }
+
+                            // 4. 疊加返利網回贈
+                            if (rebate.cashback > 0) {
+                                let cb = basePriceHKD * rebate.cashback;
+                                rewardValueHKD += cb;
+                                rewardText += ` + HK$${Math.round(cb)} 現金`;
+                            }
+                            if (rebate.avios > 0) {
+                                rewardValueHKD += rebate.avios * VALUE_AVIOS;
+                                rewardText += ` + ${Math.round(rebate.avios)} eStore Avios`;
+                            }
+
+                            // 5. 計算最終真正淨支出
+                            let netCostHKD = basePriceHKD + fxFeeHKD - rewardValueHKD;
+
+                            // 組合名稱組合
+                            let routeName = "";
+                            if (rebate.id !== 'none') routeName += `${rebate.name.replace(' ➔ ', '')} ➔ `;
+                            routeName += portal.name;
+                            if (curveActive) routeName += ` ➔ Curve`;
+                            routeName += ` ➔ ${cardId === 'everymile' ? 'HSBC EveryMile' : cardId === 'amexba' ? 'UK Amex BA' : 'UK Barclays'}`;
+
+                            combinations.push({
+                                name: routeName,
+                                basePrice: `HK$${Math.round(basePriceHKD)}`,
+                                fxFee: fxFeeHKD > 0 ? `HK$${Math.round(fxFeeHKD)}` : '免手續費',
+                                fxFeeRaw: fxFeeHKD,
+                                rewards: rewardText,
+                                netCost: netCostHKD
+                            });
+                        });
+                    });
+                });
+            });
+
+            // 依據淨支出由低至高排序
+            combinations.sort((a, b) => a.netCost - b.netCost);
+
+            // 渲染表格
+            const tbody = document.getElementById('result-table-body');
+            tbody.innerHTML = '';
+
+            if (combinations.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="px-6 py-8 text-center text-slate-500">無符合當前勾選條件的合法支付路線。</td></tr>`;
+                return;
             }
-          }
 
-          const totalRewardValue = cardRewardValue + portalRewardValue;
-          const netSpend = chargedHKD - totalRewardValue;
-          const effectivePct = (totalRewardValue / spendHKD) * 100;
+            combinations.forEach((item, index) => {
+                let medal = index === 0 ? '🥇 ' : index === 1 ? '🥈 ' : index === 2 ? '🥉 ' : `${index + 1}. `;
+                let rowClass = index === 0 ? 'bg-amber-950/20 font-medium border-l-4 border-amber-500' : '';
+                
+                tbody.innerHTML += `
+                    <tr class="${rowClass} hover:bg-slate-700/50 transition">
+                        <td class="px-6 py-4 font-semibold text-slate-100">${medal}${item.name}</td>
+                        <td class="px-6 py-4 text-slate-400">${item.basePrice}</td>
+                        <td class="px-6 py-4 ${item.fxFeeRaw > 0 ? 'text-red-400' : 'text-green-400'}">${item.fxFee}</td>
+                        <td class="px-6 py-4 text-amber-300">${item.rewards}</td>
+                        <td class="px-6 py-4 text-right text-base font-bold text-green-400">HK$${Math.round(item.netCost)}</td>
+                    </tr>
+                `;
+            });
+        }
 
-          // Build route steps
-          const routeSteps: string[] = [];
-          if (portal) routeSteps.push(portal.name);
-          routeSteps.push(entry.name);
-          if (curveActive) routeSteps.push('Curve');
-          routeSteps.push(card.name);
-
-          // Build combo name
-          const comboName = routeSteps.join(' ➔ ');
-
-          list.push({
-            rank: 0,
-            card,
-            useCurve: curveActive,
-            hotelEntry: entry,
-            portal,
-            blocked,
-            blockReason,
-            originalSpend: spendHKD,
-            chargedSpend: chargedHKD,
-            fxFeeAmount,
-            cardRewardValue,
-            cardRewardDisplay,
-            portalRewardValue,
-            portalRewardDisplay,
-            totalRewardValue,
-            netSpend,
-            effectivePct,
-            routeSteps,
-            comboName,
-          });
+        // 監聽所有輸入與勾選改動，即時重新計算
+        document.querySelectorAll('input, select').forEach(element => {
+            element.addEventListener('change', calculate);
+            element.addEventListener('input', calculate);
         });
-      });
-    });
 
-    // Sort: valid combos first by net spend ascending, then blocked combos at the end
-    list.sort((a, b) => {
-      if (a.blocked !== b.blocked) return a.blocked ? 1 : -1;
-      return a.netSpend - b.netSpend;
-    });
-    list.forEach((c, i) => (c.rank = i + 1));
-    return list;
-  }, [numericAmount, currency, category, selectedCards, useCurve, selectedHotelEntries, selectedPortals, isHotel]);
-
-  const best = combos[0];
-
-  return (
-    <div className="min-h-screen w-full">
-      {/* Header */}
-      <header className="sticky top-0 z-30 backdrop-blur-xl bg-ink-950/70 border-b border-white/5">
-        <div className="max-w-5xl mx-auto px-5 sm:px-8 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <div className="h-9 w-9 rounded-xl gold-border flex items-center justify-center shadow-glow-gold">
-              <Sparkles className="h-5 w-5 text-ink-950" strokeWidth={2.5} />
-            </div>
-            <div className="leading-tight">
-              <p className="font-display font-extrabold text-base sm:text-lg tracking-tight">
-                里數回贈<span className="gold-text">計算機</span>
-              </p>
-              <p className="text-[10px] sm:text-[11px] text-slate-400 -mt-0.5">跨國里數神級計算機</p>
-            </div>
-          </div>
-          <div className="hidden sm:flex items-center gap-1.5 text-xs text-slate-400">
-            <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
-            即時計算 · £1 = HK$10
-          </div>
-        </div>
-      </header>
-
-      <main className="max-w-5xl mx-auto px-5 sm:px-8 py-8 sm:py-12">
-        {/* Hero */}
-        <section className="text-center mb-10 sm:mb-12 animate-fade-up">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-gold-400/30 bg-gold-400/5 text-gold-200 text-xs font-medium mb-4">
-            <Award className="h-3.5 w-3.5" />
-            跨國里數最佳化
-          </div>
-          <h1 className="font-display font-extrabold text-3xl sm:text-5xl tracking-tight leading-tight">
-            最聰明嘅<span className="gold-text">支付路線</span>
-          </h1>
-          <p className="mt-3 text-slate-400 text-sm sm:text-base max-w-xl mx-auto">
-            跨幣種計算 HK ＋ UK 信用卡、Curve 過橋、返利網同酒店入口，幫你揀出真正淨支出最低嘅地獄組合。
-          </p>
-        </section>
-
-        {/* Input panel */}
-        <section className="relative animate-fade-up" style={{ animationDelay: '60ms' }}>
-          <div className="absolute -inset-px rounded-3xl gold-border opacity-40 blur-sm" aria-hidden />
-          <div className="relative rounded-3xl bg-ink-900/80 border border-white/10 shadow-card p-6 sm:p-8 backdrop-blur-xl space-y-6">
-            {/* Row 1: Amount + Currency */}
-            <div className="grid sm:grid-cols-5 gap-5">
-              <div className="sm:col-span-3">
-                <label className="block text-xs font-semibold text-slate-400 mb-2 uppercase tracking-wider">
-                  預計消費金額
-                </label>
-                <div className="relative">
-                  <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 font-medium text-sm pointer-events-none">
-                    {currency}
-                  </div>
-                  <input
-                    type="number"
-                    inputMode="decimal"
-                    min={0}
-                    step="100"
-                    placeholder="0"
-                    value={amount}
-                    onChange={(e) => setAmount(e.target.value)}
-                    className="w-full pl-16 pr-4 py-3.5 rounded-xl bg-ink-950/60 border border-white/10 text-lg font-display font-bold text-white placeholder-slate-600 focus:outline-none focus:border-gold-400/60 focus:ring-2 focus:ring-gold-400/20 transition"
-                  />
-                </div>
-                <div className="flex gap-2 mt-2.5">
-                  {(currency === 'HKD' ? [500, 1000, 2000, 5000] : [50, 100, 200, 500]).map((v) => (
-                    <button
-                      key={v}
-                      onClick={() => setAmount(String(v))}
-                      className="px-2.5 py-1 rounded-md text-xs font-medium text-slate-300 bg-white/5 hover:bg-gold-400/10 hover:text-gold-200 border border-white/5 transition"
-                    >
-                      {currency === 'HKD' ? `$${v.toLocaleString()}` : `£${v}`}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div className="sm:col-span-2">
-                <label className="block text-xs font-semibold text-slate-400 mb-2 uppercase tracking-wider">
-                  消費貨幣
-                </label>
-                <div className="grid grid-cols-2 gap-2">
-                  {(['HKD', 'GBP'] as Currency[]).map((cur) => {
-                    const active = currency === cur;
-                    return (
-                      <button
-                        key={cur}
-                        onClick={() => setCurrency(cur)}
-                        className={`flex items-center justify-center gap-2 px-3 py-3.5 rounded-xl border font-display font-bold text-sm transition-all ${
-                          active
-                            ? 'border-gold-400/60 bg-gold-400/10 shadow-glow-gold text-gold-100'
-                            : 'border-white/10 bg-ink-950/40 text-slate-300 hover:border-white/20 hover:bg-white/5'
-                        }`}
-                      >
-                        <Globe className="h-4 w-4" />
-                        {cur === 'HKD' ? 'HKD 港幣' : 'GBP 英鎊'}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
-
-            {/* Row 2: Category */}
-            <div>
-              <label className="block text-xs font-semibold text-slate-400 mb-2 uppercase tracking-wider">
-                消費類別
-              </label>
-              <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
-                {CATEGORIES.map((cat) => {
-                  const Icon = cat.icon;
-                  const active = cat.id === category;
-                  return (
-                    <button
-                      key={cat.id}
-                      onClick={() => setCategory(cat.id)}
-                      className={`group flex flex-col items-center gap-1.5 px-2 py-3 rounded-xl border text-center transition-all ${
-                        active
-                          ? 'border-gold-400/60 bg-gold-400/10 shadow-glow-gold'
-                          : 'border-white/10 bg-ink-950/40 hover:border-white/20 hover:bg-white/5'
-                      }`}
-                    >
-                      <Icon
-                        className={`h-5 w-5 transition ${active ? 'text-gold-300' : 'text-slate-400 group-hover:text-slate-200'}`}
-                        strokeWidth={2}
-                      />
-                      <span
-                        className={`text-[11px] font-medium leading-tight transition ${
-                          active ? 'text-gold-100' : 'text-slate-300'
-                        }`}
-                      >
-                        {cat.label}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Row 3: Cards multi-select */}
-            <div>
-              <div className="flex items-center gap-2 mb-2.5">
-                <CreditCard className="h-3.5 w-3.5 text-gold-300" />
-                <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
-                  信用卡（可多選）
-                </label>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
-                {CARDS.map((card) => {
-                  const checked = selectedCards.has(card.id);
-                  return (
-                    <button
-                      key={card.id}
-                      onClick={() => toggle(card.id, setSelectedCards as React.Dispatch<React.SetStateAction<Set<CardId>>>)}
-                      className={`flex items-center gap-3 px-3.5 py-3 rounded-xl border text-left transition-all ${
-                        checked
-                          ? 'border-gold-400/60 bg-gold-400/10 shadow-glow-gold'
-                          : 'border-white/10 bg-ink-950/40 hover:border-white/20 hover:bg-white/5'
-                      }`}
-                    >
-                      <span
-                        className={`flex-shrink-0 h-5 w-5 rounded-md border-2 flex items-center justify-center transition ${
-                          checked ? 'bg-gold-400 border-gold-400' : 'border-slate-500'
-                        }`}
-                      >
-                        {checked && <CheckCircle2 className="h-4 w-4 text-ink-950" strokeWidth={3} />}
-                      </span>
-                      <div className={`h-8 w-11 rounded bg-gradient-to-br ${card.accent} border border-white/20 flex-shrink-0`} />
-                      <div className="min-w-0">
-                        <p className={`text-sm font-semibold truncate ${checked ? 'text-gold-100' : 'text-slate-200'}`}>
-                          {card.name}
-                        </p>
-                        <p className="text-[11px] text-slate-500 truncate">{card.earnLabel}</p>
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Row 4: Curve toggle */}
-            <div>
-              <button
-                onClick={() => setUseCurve(!useCurve)}
-                className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-xl border transition-all ${
-                  useCurve
-                    ? 'border-gold-400/60 bg-gold-400/10 shadow-glow-gold'
-                    : 'border-white/10 bg-ink-950/40 hover:border-white/20 hover:bg-white/5'
-                }`}
-              >
-                <span
-                  className={`flex-shrink-0 h-5 w-5 rounded-md border-2 flex items-center justify-center transition ${
-                    useCurve ? 'bg-gold-400 border-gold-400' : 'border-slate-500'
-                  }`}
-                >
-                  {useCurve && <CheckCircle2 className="h-4 w-4 text-ink-950" strokeWidth={3} />}
-                </span>
-                <Zap className={`h-5 w-5 ${useCurve ? 'text-gold-300' : 'text-slate-400'}`} />
-                <div className="text-left flex-1">
-                  <p className={`text-sm font-semibold ${useCurve ? 'text-gold-100' : 'text-slate-200'}`}>
-                    Curve 過橋卡
-                  </p>
-                  <p className="text-[11px] text-slate-500">外幣手續費歸零 · 僅支援 Mastercard（Barclays），不支援 Amex / Visa</p>
-                </div>
-              </button>
-            </div>
-
-            {/* Row 5: Hotel entries (only for hotel category) */}
-            {isHotel && (
-              <div>
-                <div className="flex items-center gap-2 mb-2.5">
-                  <Hotel className="h-3.5 w-3.5 text-gold-300" />
-                  <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
-                    酒店入口（可多選）
-                  </label>
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
-                  {HOTEL_ENTRIES.map((entry) => {
-                    const Icon = entry.icon;
-                    const checked = selectedHotelEntries.has(entry.id);
-                    return (
-                      <button
-                        key={entry.id}
-                        onClick={() => toggle(entry.id, setSelectedHotelEntries as React.Dispatch<React.SetStateAction<Set<HotelEntryId>>>)}
-                        className={`flex items-center gap-3 px-3.5 py-3 rounded-xl border text-left transition-all ${
-                          checked
-                            ? 'border-gold-400/60 bg-gold-400/10 shadow-glow-gold'
-                            : 'border-white/10 bg-ink-950/40 hover:border-white/20 hover:bg-white/5'
-                        }`}
-                      >
-                        <span
-                          className={`flex-shrink-0 h-5 w-5 rounded-md border-2 flex items-center justify-center transition ${
-                            checked ? 'bg-gold-400 border-gold-400' : 'border-slate-500'
-                          }`}
-                        >
-                          {checked && <CheckCircle2 className="h-4 w-4 text-ink-950" strokeWidth={3} />}
-                        </span>
-                        <Icon className={`h-4 w-4 ${checked ? 'text-gold-300' : 'text-slate-400'}`} />
-                        <div className="min-w-0">
-                          <p className={`text-sm font-semibold truncate ${checked ? 'text-gold-100' : 'text-slate-200'}`}>
-                            {entry.name}
-                          </p>
-                          <p className="text-[11px] text-slate-500 truncate">{entry.note}</p>
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-
-            {/* Row 6: Portals (only for hotel + agoda-web) */}
-            {isHotel && (
-              <div>
-                <div className="flex items-center gap-2 mb-2.5">
-                  <Link2 className="h-3.5 w-3.5 text-gold-300" />
-                  <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
-                    返利網（可多選 · 僅 Agoda 網頁版適用）
-                  </label>
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                  {PORTALS.map((portal) => {
-                    const Icon = portal.icon;
-                    const checked = selectedPortals.has(portal.id);
-                    return (
-                      <button
-                        key={portal.id}
-                        onClick={() => toggle(portal.id, setSelectedPortals as React.Dispatch<React.SetStateAction<Set<PortalId>>>)}
-                        className={`flex items-center gap-3 px-3.5 py-3 rounded-xl border text-left transition-all ${
-                          checked
-                            ? 'border-gold-400/60 bg-gold-400/10 shadow-glow-gold'
-                            : 'border-white/10 bg-ink-950/40 hover:border-white/20 hover:bg-white/5'
-                        }`}
-                      >
-                        <span
-                          className={`flex-shrink-0 h-5 w-5 rounded-md border-2 flex items-center justify-center transition ${
-                            checked ? 'bg-gold-400 border-gold-400' : 'border-slate-500'
-                          }`}
-                        >
-                          {checked && <CheckCircle2 className="h-4 w-4 text-ink-950" strokeWidth={3} />}
-                        </span>
-                        <Icon className={`h-4 w-4 ${checked ? 'text-gold-300' : 'text-slate-400'}`} />
-                        <div className="min-w-0">
-                          <p className={`text-sm font-semibold truncate ${checked ? 'text-gold-100' : 'text-slate-200'}`}>
-                            {portal.name}
-                          </p>
-                          <p className="text-[11px] text-slate-500 truncate">{portal.rateLabel}</p>
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-
-            {/* Live summary strip */}
-            <div className="pt-5 border-t border-white/5 flex flex-wrap items-center justify-between gap-3">
-              <div className="flex items-center gap-2 text-sm text-slate-400">
-                <TrendingUp className="h-4 w-4 text-gold-300" />
-                <span>
-                  {numericAmount > 0 ? (
-                    <>
-                      消費 <span className="text-white font-semibold">{currency} {numericAmount.toLocaleString()}</span>
-                      <span className="text-slate-500"> (≈ HKD ${formatHKD(toHKD(numericAmount, currency))})</span> · {activeCat.label}
-                    </>
-                  ) : (
-                    '輸入金額即時計算'
-                  )}
-                </span>
-              </div>
-              {best && (
-                <div className="flex items-center gap-2 text-sm">
-                  <span className="text-slate-400">最平淨支出</span>
-                  <span className="gold-text font-display font-bold">HKD ${formatHKD(best.netSpend)}</span>
-                </div>
-              )}
-            </div>
-          </div>
-        </section>
-
-        {/* Results */}
-        <section className="mt-8">
-          {numericAmount <= 0 ? (
-            <EmptyState />
-          ) : selectedCards.size === 0 ? (
-            <div className="rounded-2xl border border-dashed border-gold-400/30 bg-ink-900/40 p-12 text-center">
-              <div className="mx-auto h-14 w-14 rounded-2xl bg-white/5 flex items-center justify-center mb-4">
-                <CreditCard className="h-7 w-7 text-slate-500" />
-              </div>
-              <p className="text-slate-400 font-medium">請至少選擇一張信用卡</p>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              <div className="flex items-center gap-2 text-sm text-gold-200 mb-1">
-                <Layers className="h-4 w-4" />
-                <span className="font-display font-semibold">最聰明嘅支付路線</span>
-                <span className="text-slate-500">· 按「真正淨支出」由低至高排序（HKD 結算）</span>
-              </div>
-              <ResultsTable combos={combos} />
-            </div>
-          )}
-        </section>
-
-        {/* Methodology */}
-        <section className="mt-12 grid sm:grid-cols-3 gap-4">
-          <InfoCard
-            icon={Coins}
-            title="里數估值"
-            body="1 Avios = HK$0.11；1 亞萬里數 = HK$0.10。匯率基準 £1 = HK$10。"
-          />
-          <InfoCard
-            icon={Layers}
-            title="組合排序"
-            body="所有組合按「真正淨支出」（消費 − 總回贈）以 HKD 統一結算，由低至高排序。"
-          />
-          <InfoCard
-            icon={Sparkles}
-            title="測試數據"
-            body="卡種回贈率、手續費及返利網比率為硬編碼示範數據，實際以銀行及平台公佈為準。"
-          />
-        </section>
-
-        <footer className="mt-12 text-center text-xs text-slate-500">
-          <p>僅供參考 · 不構成財務建議 · 1 Avios = $0.11 HKD · 1 里 = $0.10 HKD · £1 = HK$10</p>
-        </footer>
-      </main>
-    </div>
-  );
-}
-
-// ────────────────────────────────────────────────────────────
-// Components
-// ────────────────────────────────────────────────────────────
-
-function EmptyState() {
-  return (
-    <div className="rounded-2xl border border-dashed border-white/10 bg-ink-900/40 p-12 text-center animate-fade-up">
-      <div className="mx-auto h-14 w-14 rounded-2xl bg-white/5 flex items-center justify-center mb-4">
-        <Wallet className="h-7 w-7 text-slate-500" />
-      </div>
-      <p className="text-slate-400 font-medium">輸入預計消費金額</p>
-      <p className="text-slate-600 text-sm mt-1">即時計算跨國里數最聰明支付路線</p>
-    </div>
-  );
-}
-
-function ResultsTable({ combos }: { combos: ComboResult[] }) {
-  const validCombos = combos.filter((c) => !c.blocked);
-  const blockedCombos = combos.filter((c) => c.blocked);
-
-  return (
-    <>
-      {/* Desktop table */}
-      <div className="hidden lg:block overflow-hidden rounded-2xl border border-white/10 bg-ink-900/60 backdrop-blur-xl">
-        <table className="w-full">
-          <thead>
-            <tr className="border-b border-white/10 bg-ink-950/40">
-              <th className="px-4 py-3.5 text-left text-[11px] font-bold text-slate-400 uppercase tracking-wider w-[28%]">排名 & 組合</th>
-              <th className="px-4 py-3.5 text-right text-[11px] font-bold text-slate-400 uppercase tracking-wider">原始房價</th>
-              <th className="px-4 py-3.5 text-right text-[11px] font-bold text-slate-400 uppercase tracking-wider">手續費</th>
-              <th className="px-4 py-3.5 text-right text-[11px] font-bold text-slate-400 uppercase tracking-wider">預估回贈</th>
-              <th className="px-4 py-3.5 text-right text-[11px] font-bold text-slate-400 uppercase tracking-wider">Net Cost</th>
-              <th className="px-4 py-3.5 text-center text-[11px] font-bold text-slate-400 uppercase tracking-wider w-[60px]"></th>
-            </tr>
-          </thead>
-          <tbody>
-            {validCombos.map((combo) => (
-              <DesktopRow key={`${combo.card.id}-${combo.hotelEntry.id}-${combo.portal?.id ?? 'none'}-${combo.useCurve}`} combo={combo} />
-            ))}
-            {blockedCombos.length > 0 && (
-              <tr>
-                <td colSpan={6} className="px-4 py-2 bg-red-950/20">
-                  <div className="flex items-center gap-2 text-[11px] font-bold text-red-300 uppercase tracking-wider">
-                    <Ban className="h-3.5 w-3.5" />
-                    以下組合因限制而不可行
-                  </div>
-                </td>
-              </tr>
-            )}
-            {blockedCombos.map((combo) => (
-              <DesktopRow key={`${combo.card.id}-${combo.hotelEntry.id}-${combo.portal?.id ?? 'none'}-${combo.useCurve}`} combo={combo} />
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      {/* Mobile cards */}
-      <div className="lg:hidden space-y-3">
-        {validCombos.map((combo) => (
-          <MobileRow key={`${combo.card.id}-${combo.hotelEntry.id}-${combo.portal?.id ?? 'none'}-${combo.useCurve}`} combo={combo} />
-        ))}
-        {blockedCombos.length > 0 && (
-          <div className="flex items-center gap-2 text-[11px] font-bold text-red-300 uppercase tracking-wider pt-2">
-            <Ban className="h-3.5 w-3.5" />
-            以下組合因限制而不可行
-          </div>
-        )}
-        {blockedCombos.map((combo) => (
-          <MobileRow key={`${combo.card.id}-${combo.hotelEntry.id}-${combo.portal?.id ?? 'none'}-${combo.useCurve}`} combo={combo} />
-        ))}
-      </div>
-    </>
-  );
-}
-
-function DesktopRow({ combo }: { combo: ComboResult }) {
-  const { rank, comboName, blocked, blockReason } = combo;
-  const isBest = rank === 1 && !blocked;
-  return (
-    <tr className={`border-b border-white/5 transition-colors ${blocked ? 'bg-red-950/10 opacity-60' : isBest ? 'bg-gold-400/5' : 'hover:bg-white/[0.02]'}`}>
-      <td className="px-4 py-4">
-        <div className="flex items-center gap-2.5">
-          <span className={`flex-shrink-0 flex items-center justify-center h-7 w-7 rounded-lg text-xs font-bold ${
-            blocked ? 'bg-red-500/20 text-red-300' : isBest ? 'bg-gold-400 text-ink-950' : 'bg-white/5 text-slate-400'
-          }`}>
-            {blocked ? <Ban className="h-3.5 w-3.5" /> : rank}
-          </span>
-          <div className="min-w-0">
-            <p className={`text-sm font-display font-semibold truncate ${blocked ? 'text-slate-400' : isBest ? 'text-gold-100' : 'text-slate-200'}`}>
-              {isBest && <span className="mr-1">🥇</span>}{comboName}
-            </p>
-            {blocked && <p className="text-[11px] text-red-300 truncate">{blockReason}</p>}
-          </div>
-        </div>
-      </td>
-      <td className="px-4 py-4 text-right">
-        <span className="text-sm text-slate-300 font-medium">HKD ${formatHKD(combo.originalSpend)}</span>
-        {combo.hotelEntry.baseMultiplier < 1.0 && (
-          <p className="text-[11px] text-violet-300">→ ${formatHKD(combo.originalSpend * combo.hotelEntry.baseMultiplier)} ({(combo.hotelEntry.baseMultiplier * 100).toFixed(0)}%)</p>
-        )}
-      </td>
-      <td className="px-4 py-4 text-right">
-        {combo.fxFeeAmount > 0 ? (
-          <span className="text-sm text-red-300 font-medium">+ ${formatHKD(combo.fxFeeAmount)}</span>
-        ) : combo.useCurve ? (
-          <span className="text-sm text-emerald-300 font-medium">$0 <span className="text-[10px]">Curve</span></span>
-        ) : (
-          <span className="text-sm text-slate-500">$0</span>
-        )}
-      </td>
-      <td className="px-4 py-4 text-right">
-        <div className="space-y-0.5">
-          {combo.portal && (
-            <p className="text-[11px] text-sky-200">{combo.portalRewardDisplay}{combo.portal.kind === 'avios' && ` (估值 ${formatHKD(combo.portalRewardValue)})`}</p>
-          )}
-          <p className="text-[11px] text-gold-200">{combo.cardRewardDisplay} (估值 ${formatHKD(combo.cardRewardValue)})</p>
-          <p className="text-xs text-slate-400 font-semibold">= ${formatHKD(combo.totalRewardValue)}</p>
-        </div>
-      </td>
-      <td className="px-4 py-4 text-right">
-        <span className={`font-display font-extrabold text-base ${blocked ? 'text-slate-500' : isBest ? 'gold-text' : 'text-white'}`}>
-          HKD ${formatHKD(combo.netSpend)}
-        </span>
-        {!blocked && <p className="text-[11px] text-slate-500">{combo.effectivePct.toFixed(2)}% 回報</p>}
-      </td>
-      <td className="px-4 py-4 text-center">
-        {!blocked && (
-          <a
-            href={combo.card.applyUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={`inline-flex items-center justify-center h-8 w-8 rounded-lg transition-all ${
-              isBest
-                ? 'bg-gradient-to-r from-gold-300 to-gold-500 text-ink-950 hover:shadow-glow-gold'
-                : 'bg-gold-400/10 text-gold-200 border border-gold-400/30 hover:bg-gold-400/20'
-            }`}
-            title="立即申請"
-          >
-            <ArrowUpRight className="h-4 w-4" strokeWidth={2.5} />
-          </a>
-        )}
-      </td>
-    </tr>
-  );
-}
-
-function MobileRow({ combo }: { combo: ComboResult }) {
-  const { rank, comboName, blocked, blockReason } = combo;
-  const isBest = rank === 1 && !blocked;
-  return (
-    <div className={`rounded-xl border p-4 ${blocked ? 'border-red-500/20 bg-red-950/10 opacity-60' : isBest ? 'border-gold-400/40 bg-ink-900/80 shadow-glow-gold' : 'border-white/10 bg-ink-900/50'}`}>
-      <div className="flex items-center justify-between gap-2 mb-3">
-        <div className="flex items-center gap-2 min-w-0">
-          <span className={`flex-shrink-0 flex items-center justify-center h-6 w-6 rounded-lg text-xs font-bold ${
-            blocked ? 'bg-red-500/20 text-red-300' : isBest ? 'bg-gold-400 text-ink-950' : 'bg-white/5 text-slate-400'
-          }`}>
-            {blocked ? <Ban className="h-3 w-3" /> : rank}
-          </span>
-          <p className={`text-sm font-display font-semibold truncate ${blocked ? 'text-slate-400' : isBest ? 'text-gold-100' : 'text-slate-200'}`}>
-            {isBest && <span className="mr-1">🥇</span>}{comboName}
-          </p>
-        </div>
-        {!blocked && (
-          <a
-            href={combo.card.applyUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={`flex-shrink-0 inline-flex items-center justify-center h-8 w-8 rounded-lg transition-all ${
-              isBest
-                ? 'bg-gradient-to-r from-gold-300 to-gold-500 text-ink-950'
-                : 'bg-gold-400/10 text-gold-200 border border-gold-400/30'
-            }`}
-          >
-            <ArrowUpRight className="h-4 w-4" strokeWidth={2.5} />
-          </a>
-        )}
-      </div>
-
-      {blocked && <p className="text-[11px] text-red-300 mb-3">{blockReason}</p>}
-
-      {!blocked && (
-        <div className="space-y-1.5 text-sm">
-          <div className="flex justify-between">
-            <span className="text-slate-500">原始房價</span>
-            <span className="text-slate-300 font-medium">HKD ${formatHKD(combo.originalSpend)}{combo.hotelEntry.baseMultiplier < 1.0 && <span className="text-violet-300 ml-1">→ ${(combo.hotelEntry.baseMultiplier * 100).toFixed(0)}%</span>}</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-slate-500">手續費</span>
-            {combo.fxFeeAmount > 0
-              ? <span className="text-red-300 font-medium">+ ${formatHKD(combo.fxFeeAmount)}</span>
-              : combo.useCurve
-                ? <span className="text-emerald-300 font-medium">$0 (Curve)</span>
-                : <span className="text-slate-500">$0</span>}
-          </div>
-          <div className="flex justify-between">
-            <span className="text-slate-500">回贈</span>
-            <div className="text-right">
-              {combo.portal && <p className="text-[11px] text-sky-200">{combo.portalRewardDisplay}</p>}
-              <p className="text-[11px] text-gold-200">{combo.cardRewardDisplay} (估值 ${formatHKD(combo.cardRewardValue)})</p>
-            </div>
-          </div>
-          <div className="flex justify-between pt-2 border-t border-white/10">
-            <span className="text-white font-semibold">Net Cost</span>
-            <span className={`font-display font-extrabold ${isBest ? 'gold-text' : 'text-white'}`}>HKD ${formatHKD(combo.netSpend)}</span>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
-function InfoCard({ icon: Icon, title, body }: { icon: typeof Coins; title: string; body: string }) {
-  return (
-    <div className="rounded-xl border border-white/10 bg-ink-900/40 p-4">
-      <Icon className="h-5 w-5 text-gold-300 mb-2" />
-      <p className="font-display font-semibold text-sm text-white">{title}</p>
-      <p className="text-xs text-slate-400 mt-1 leading-relaxed">{body}</p>
-    </div>
-  );
-}
-
-export default App;
+        // 首次初始化計算
+        calculate();
+    </script>
+</body>
+</html>  
