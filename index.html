@@ -12,37 +12,41 @@
 <body class="p-4 md:p-8">
     <div class="max-w-6xl mx-auto">
         <header class="mb-6 text-center">
-            <h1 class="text-2xl font-bold text-amber-400 mb-1">🌍 跨國里數清晰決策矩陣</h1>
-            <p class="text-slate-400 text-sm">已拆分多欄位表格，TopCashback 修正為日常 5% 基準</p>
+            <h1 class="text-2xl font-bold text-amber-400 mb-1">🌍 跨國里數萬能決策矩陣</h1>
+            <p class="text-slate-400 text-sm">已解鎖萬能外幣匯率、信用卡專屬說明，以及精準回贈算式</p>
         </header>
 
+        <!-- 參數輸入 -->
         <div class="bg-slate-800/80 backdrop-blur p-5 rounded-xl border border-slate-700 mb-6 grid grid-cols-1 md:grid-cols-4 gap-4 text-sm">
             <div>
-                <label class="block text-slate-400 mb-1">預計簽賬金額</label>
+                <label class="block text-slate-400 mb-1">預計簽賬金額 (外幣或本地幣)</label>
                 <input type="number" id="amount" value="1000" class="w-full bg-slate-900 border border-slate-600 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-amber-400">
             </div>
             <div>
                 <label class="block text-slate-400 mb-1">貨幣</label>
                 <select id="currency" class="w-full bg-slate-900 border border-slate-600 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-amber-400">
-                    <option value="GBP">GBP 英鎊</option>
+                    <option value="FOREIGN">外幣 (JPY, GBP, EUR, USD 等)</option>
                     <option value="HKD">HKD 港幣</option>
                 </select>
             </div>
             <div>
-                <label class="block text-slate-400 mb-1">今日自訂匯率 (1 GBP = ? HKD)</label>
-                <input type="number" id="fx_rate" value="10.15" step="0.01" class="w-full bg-slate-900 border border-slate-600 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-amber-400">
+                <label class="block text-slate-400 mb-1">今日匯率 (1 外幣 = ? HKD)</label>
+                <input type="number" id="fx_rate" value="10.15" step="0.0001" class="w-full bg-slate-900 border border-slate-600 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-amber-400">
+                <span class="text-[11px] text-slate-400 mt-1 block">提示：英鎊入 10.15 / 日圓入 0.051</span>
             </div>
             <div>
                 <label class="block text-slate-400 mb-1">消費類別</label>
                 <select id="category" class="w-full bg-slate-900 border border-slate-600 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-amber-400">
                     <option value="hotel">酒店/旅遊訂房 (Agoda/Booking/Trip)</option>
-                    <option value="dining">餐飲 / 日常指定商戶</option>
+                    <option value="dining">餐飲 / 日常指定商戶 ($2里專區)</option>
                     <option value="general">其他一般簽賬 (非指定商戶)</option>
                 </select>
             </div>
         </div>
 
+        <!-- 核心多選控制區 -->
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6 text-sm bg-slate-800/40 p-4 rounded-xl border border-slate-700/60">
+            <!-- 1. 酒店通道 -->
             <div>
                 <span class="text-amber-400 font-medium block mb-2">🏨 旅遊管道</span>
                 <div class="space-y-1.5">
@@ -55,32 +59,53 @@
                     <label class="flex items-center space-x-2"><input type="checkbox" id="p_trip_app" checked class="rounded text-amber-500"> <span>Trip.com App (95折)</span></label>
                 </div>
             </div>
-            <div>
-                <span class="text-amber-400 font-medium block mb-2">💳 擁有信用卡</span>
-                <div class="space-y-1.5">
-                    <label class="flex items-center space-x-2"><input type="checkbox" id="c_em" checked class="rounded text-amber-500"> <span>HSBC EveryMile</span></label>
-                    <label class="flex items-center space-x-2"><input type="checkbox" id="c_sccx" checked class="rounded text-amber-500"> <span>渣打國泰卡</span></label>
-                    <label class="flex items-center space-x-2"><input type="checkbox" id="c_barc" checked class="rounded text-amber-500"> <span>UK Barclays Avios+</span></label>
-                    <label class="flex items-center space-x-2"><input type="checkbox" id="c_virgin" checked class="rounded text-amber-500"> <span>UK Virgin Atlantic</span></label>
-                    <label class="flex items-center space-x-2"><input type="checkbox" id="c_amexgold" checked class="rounded text-amber-500"> <span>UK Amex Gold</span></label>
+            <!-- 2. 手動信用卡選擇區 + 絕技說明 (大升級) -->
+            <div class="md:col-span-2">
+                <span class="text-amber-400 font-medium block mb-2">💳 擁有信用卡及回贈絕技</span>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <div class="bg-slate-900/40 p-2 rounded border border-slate-700">
+                        <label class="flex items-center space-x-2 font-medium"><input type="checkbox" id="c_em" checked class="rounded text-amber-500"> <span>HSBC EveryMile</span></label>
+                        <p class="text-[11px] text-slate-400 mt-0.5">特權：外幣/指定商戶 HK$2/里；本地普通 HK$5/里。無海外手續費減免。</p>
+                    </div>
+                    <div class="bg-slate-900/40 p-2 rounded border border-slate-700">
+                        <label class="flex items-center space-x-2 font-medium"><input type="checkbox" id="c_sccx" checked class="rounded text-amber-500"> <span>渣打國泰卡</span></label>
+                        <p class="text-[11px] text-slate-400 mt-0.5">特權：食肆/外幣/旅遊訂房 HK$4/里；本地普通 HK$6/里。</p>
+                    </div>
+                    <div class="bg-slate-900/40 p-2 rounded border border-slate-700">
+                        <label class="flex items-center space-x-2 font-medium"><input type="checkbox" id="c_barc" checked class="rounded text-amber-500"> <span>UK Barclays Avios+</span></label>
+                        <p class="text-[11px] text-slate-400 mt-0.5">特權：任何簽賬 £1 = 1.5 Avios。簽非英鎊收 2.99% 手續費。</p>
+                    </div>
+                    <div class="bg-slate-900/40 p-2 rounded border border-slate-700">
+                        <label class="flex items-center space-x-2 font-medium"><input type="checkbox" id="c_virgin" checked class="rounded text-amber-500"> <span>UK Virgin Atlantic</span></label>
+                        <p class="text-[11px] text-slate-400 mt-0.5">特權：任何簽賬 £1 = 1.5 维珍里。簽非英鎊收 2.99% 手續費。</p>
+                    </div>
+                    <div class="bg-slate-900/40 p-2 rounded border border-slate-700 shadow-sm sm:col-span-2">
+                        <label class="flex items-center space-x-2 font-medium"><input type="checkbox" id="c_amexgold" checked class="rounded text-amber-500"> <span>UK Amex Gold</span></label>
+                        <p class="text-[11px] text-slate-400 mt-0.5">特權：每消費 £1 = 1 分（海外消費或官網訂機票 £1 = 2 分）。簽非英鎊收 2.99% 費。</p>
+                    </div>
                 </div>
             </div>
+            <!-- 3. 工具與返利 -->
             <div>
-                <span class="text-amber-400 font-medium block mb-2">⚡ 過橋工具</span>
-                <label class="flex items-center space-x-2"><input type="checkbox" id="use_curve" checked class="rounded text-amber-500"> <span>Curve 卡過橋 (免2.99%費)</span></label>
-            </div>
-            <div>
-                <span class="text-amber-400 font-medium block mb-2">💰 返利網 (只限網頁)</span>
-                <div class="space-y-1.5">
-                    <label class="flex items-center space-x-2"><input type="checkbox" id="r_tcb" checked class="rounded text-amber-500"> <span>TopCashback (平穩 5%)</span></label>
-                    <label class="flex items-center space-x-2"><input type="checkbox" id="r_ba" checked class="rounded text-amber-500"> <span>BA eStore ($10=3 Avios)</span></label>
+                <span class="text-amber-400 font-medium block mb-2">⚡ 輔助工具 / 返利網</span>
+                <div class="space-y-3">
+                    <div>
+                        <label class="flex items-center space-x-2"><input type="checkbox" id="use_curve" checked class="rounded text-amber-500"> <span class="font-medium">Curve 卡過橋</span></label>
+                        <p class="text-[11px] text-slate-400 mt-0.5">幫 UK 卡免除 2.99% 外幣費</p>
+                    </div>
+                    <hr class="border-slate-700">
+                    <div class="space-y-1.5">
+                        <label class="flex items-center space-x-2"><input type="checkbox" id="r_tcb" checked class="rounded text-amber-500"> <span>TopCashback (平穩 5%)</span></label>
+                        <label class="flex items-center space-x-2"><input type="checkbox" id="r_ba" checked class="rounded text-amber-500"> <span>BA eStore ($10=3 Avios)</span></label>
+                    </div>
                 </div>
             </div>
         </div>
 
+        <!-- 表格 -->
         <div class="bg-slate-800 rounded-xl border border-slate-700 overflow-hidden shadow-2xl">
             <div class="bg-slate-900 px-4 py-3 border-b border-slate-700">
-                <h2 class="text-base font-bold text-slate-200">📊 跨國智能格價矩陣排行 (淨支出最平排最前)</h2>
+                <h2 class="text-base font-bold text-slate-200">📊 跨國智能格價矩陣 (淨支出最平排最前)</h2>
             </div>
             <div class="overflow-x-auto">
                 <table class="w-full text-left text-sm">
@@ -90,12 +115,13 @@
                             <th class="px-4 py-3">使用信用卡</th>
                             <th class="px-4 py-3">過橋 / 返利疊加</th>
                             <th class="px-4 py-3">折後原價 + 手續費</th>
-                            <th class="px-4 py-3">預估回贈細節</th>
+                            <th class="px-4 py-3">預估回贈細節 (含精算公式)</th>
                             <th class="px-4 py-3 text-right">真正淨支出</th>
                         </tr>
                     </thead>
                     <tbody id="matrix-body" class="divide-y divide-slate-700/60 text-slate-300">
-                        </tbody>
+                        <!-- 動態數據 -->
+                    </tbody>
                 </table>
             </div>
         </div>
@@ -112,9 +138,10 @@
             const fx = parseFloat(document.getElementById('fx_rate').value) || 10.15;
             const cat = document.getElementById('category').value;
 
-            const amtHKD = cur === 'GBP' ? amt * fx : amt;
+            // 統一計算出港幣總金額
+            const amtHKD = cur === 'FOREIGN' ? amt * fx : amt;
 
-            // 1. 取得勾選的通道
+            // 1. 通道
             let portals = [];
             if (cat === 'hotel') {
                 if (document.getElementById('p_agoda_web').checked) portals.push({ id:'ag_web', name:'Agoda 網頁版', disc:1, rebate:true });
@@ -128,7 +155,7 @@
                 portals.push({ id:'normal', name: cat === 'dining' ? '日常餐飲商戶' : '標準一般管道', disc:1, rebate:false });
             }
 
-            // 2. 建立信用卡池 (連動畫面的 Checkbox)
+            // 2. 信用卡
             const cardPool = [
                 { id:'em', name:'HSBC EveryMile', origin:'HK', show: document.getElementById('c_em').checked },
                 { id:'sccx', name:'渣打國泰卡', origin:'HK', show: document.getElementById('c_sccx').checked },
@@ -143,16 +170,15 @@
 
             portals.forEach(p => {
                 cards.forEach(c => {
-                    // 業務安全鎖
                     if (p.id === 'ag_em' && c.id !== 'em') return; 
                     if (p.id === 'bk_barc' && c.id !== 'barc') return; 
 
                     let curveActive = false;
-                    if (useCurve && c.origin === 'UK' && cur === 'HKD' && (c.id === 'barc' || c.id === 'virgin')) {
+                    // 當使用者選擇用 HKD 結算，而使用的是 UK 卡時，Curve 可以發揮免外幣手續費功用
+                    if (useCurve && c.origin === 'UK' && cur === 'HKD' && (c.id === 'barc' || c.id === 'virgin' || c.id === 'amexgold')) {
                         curveActive = true;
                     }
 
-                    // 處理返利網 (TopCashback 修正為真實日常的 5%)
                     let rebateList = [{ id:'none', name:'--', cb:0, avios:0 }];
                     if (p.rebate) {
                         if (document.getElementById('r_tcb').checked) rebateList.push({ id:'tcb', name:'TopCashback (5%)', cb:0.05, avios:0 });
@@ -162,7 +188,7 @@
                     rebateList.forEach(r => {
                         let priceHKD = amtHKD * p.disc;
                         
-                        // 外幣手續費計算
+                        // 外幣手續費邏輯
                         let feeHKD = 0;
                         let feeText = "免手續費";
                         if (cur === 'HKD' && c.origin === 'UK') {
@@ -172,38 +198,45 @@
                                 feeHKD = priceHKD * 0.0299;
                                 feeText = `+HK$${Math.round(feeHKD)} (2.99%)`;
                             }
-                        } else if (cur === 'GBP' && c.origin === 'HK') {
+                        } else if (cur === 'FOREIGN' && c.origin === 'HK') {
                             feeHKD = priceHKD * 0.0195;
                             feeText = `+HK$${Math.round(feeHKD)} (1.95%)`;
                         }
 
-                        // 里數計算
                         let rewardText = "";
                         let rewardValue = 0;
 
+                        // 精準計算每一張卡的回贈
                         if (c.id === 'em') {
-                            let isSpecial = (cat === 'hotel' || cat === 'dining');
-                            let rate = (cur === 'GBP' || isSpecial) ? 2 : 5;
+                            // 修正邏輯：必須是「外幣交易」或者是「酒店/餐飲特約商戶」才觸發 $2/里，否則一律 $5/里
+                            let isSpecialMerchant = (cat === 'hotel' || cat === 'dining');
+                            let rate = (cur === 'FOREIGN' || isSpecialMerchant) ? 2 : 5;
                             let miles = priceHKD / rate;
                             rewardValue = miles * VALUE_AMILE;
-                            rewardText = `${Math.round(miles)} 亞萬里 ($${rate}/里)`;
+                            rewardText = `<span class="text-emerald-400 font-medium">${Math.round(miles)} 亞萬里</span><br><span class="text-[10px] text-slate-400">(HK$${Math.round(priceHKD)} / $${rate}里)</span>`;
                         } else if (c.id === 'sccx') {
-                            let rate = (cur === 'GBP' || cat === 'hotel') ? 4 : 6;
+                            let isSpecial = (cur === 'FOREIGN' || cat === 'hotel' || cat === 'dining');
+                            let rate = isSpecial ? 4 : 6;
                             let miles = priceHKD / rate;
                             rewardValue = miles * VALUE_AMILE;
-                            rewardText = `${Math.round(miles)} 國泰里 ($${rate}/里)`;
+                            rewardText = `<span class="text-emerald-400 font-medium">${Math.round(miles)} 國泰里</span><br><span class="text-[10px] text-slate-400">(HK$${Math.round(priceHKD)} / $${rate}里)</span>`;
                         } else if (c.id === 'barc') {
-                            let avios = (priceHKD / fx) * 1.5;
+                            let spendInGBP = priceHKD / fx;
+                            let avios = spendInGBP * 1.5;
                             rewardValue = avios * VALUE_AVIOS;
-                            rewardText = `${Math.round(avios)} Avios`;
+                            rewardText = `<span class="text-indigo-300 font-medium">${Math.round(avios)} Avios</span><br><span class="text-[10px] text-slate-400">(£${Math.round(spendInGBP)} x 1.5)</span>`;
                         } else if (c.id === 'virgin') {
-                            let vMiles = (priceHKD / fx) * 1.5;
+                            let spendInGBP = priceHKD / fx;
+                            let vMiles = spendInGBP * 1.5;
                             rewardValue = vMiles * VALUE_VIRGIN;
-                            rewardText = `${Math.round(vMiles)} 维珍里`;
+                            rewardText = `<span class="text-rose-300 font-medium">${Math.round(vMiles)} 维珍里</span><br><span class="text-[10px] text-slate-400">(£${Math.round(spendInGBP)} x 1.5)</span>`;
                         } else if (c.id === 'amexgold') {
-                            let pts = (priceHKD / fx) * 1.0;
+                            let spendInGBP = priceHKD / fx;
+                            // 海外消費(即非HKD結算)觸發 1鎊=2分，否則基礎 1鎊=1分
+                            let multiplier = (cur === 'FOREIGN') ? 2.0 : 1.0;
+                            let pts = spendInGBP * multiplier;
                             rewardValue = pts * VALUE_AVIOS;
-                            rewardText = `${Math.round(pts)} Amex分`;
+                            rewardText = `<span class="text-amber-200 font-medium">${Math.round(pts)} Amex分</span><br><span class="text-[10px] text-slate-400">(£${Math.round(spendInGBP)} x ${multiplier})</span>`;
                         }
 
                         // 疊加返利網
@@ -216,11 +249,11 @@
                         if (r.cb > 0) {
                             let cbAmt = priceHKD * r.cb;
                             rewardValue += cbAmt;
-                            rewardText += `<br>+現金 HK$${Math.round(cbAmt)}`;
+                            rewardText += `<br><span class="text-emerald-400 text-[11px]">+現金 HK$${Math.round(cbAmt)} (5%)</span>`;
                         }
                         if (r.avios > 0) {
                             rewardValue += r.avios * VALUE_AVIOS;
-                            rewardText += `<br>+${Math.round(r.avios)} eStore Avios`;
+                            rewardText += `<br><span class="text-indigo-300 text-[11px]">+${Math.round(r.avios)} eStore Avios</span>`;
                         }
 
                         let netCost = priceHKD + feeHKD - rewardValue;
@@ -229,7 +262,7 @@
                             portalName: p.name,
                             cardName: c.name,
                             tools: crossToolText,
-                            costDetail: `HK$${Math.round(priceHKD)}<br><span class="text-xs text-slate-400">${feeText}</span>`,
+                            costDetail: `HK$${Math.round(priceHKD)}<br><span class="text-[11px] text-slate-400">${feeText}</span>`,
                             rewardDetail: rewardText,
                             net: netCost
                         });
@@ -247,7 +280,7 @@
                 return;
             }
 
-            results.slice(0, 12).forEach((item, idx) => {
+            results.slice(0, 15).forEach((item, idx) => {
                 let badge = idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : `${idx + 1}`;
                 let rowBg = idx === 0 ? 'bg-amber-500/10 font-medium border-l-2 border-amber-500' : '';
                 tbody.innerHTML += `
@@ -255,8 +288,8 @@
                         <td class="px-4 py-3"><span class="inline-block w-5 text-amber-400 font-bold">${badge}</span> ${item.portalName}</td>
                         <td class="px-4 py-3 font-medium text-slate-200">${item.cardName}</td>
                         <td class="px-4 py-3 text-slate-400 text-xs">${item.tools}</td>
-                        <td class="px-4 py-3 text-xs">${item.costDetail}</td>
-                        <td class="px-4 py-3 text-amber-300 text-xs leading-relaxed">${item.rewardDetail}</td>
+                        <td class="px-4 py-3 text-xs leading-tight">${item.costDetail}</td>
+                        <td class="px-4 py-3 text-slate-300 text-xs leading-relaxed">${item.rewardDetail}</td>
                         <td class="px-4 py-3 text-right text-emerald-400 font-bold text-base">HK$${Math.round(item.net)}</td>
                     </tr>
                 `;
